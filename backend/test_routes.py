@@ -27,7 +27,7 @@ class AppTestCase(unittest.TestCase):
         pass
     
     def test_get_exercises(self):
-        """Test it gets available exercises"""
+        """Test it gets all available exercises"""
         # Given
         status_code = 200
         
@@ -42,7 +42,43 @@ class AppTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertTrue(data['answers'])
         self.assertTrue(data['total_exercises'])
+        
+    def test_get_exercise(self):
+        """Test it gets a specific exercise"""
+        # Given
+        res = self.client().get("/exercises")
+        data = json.loads(res.data)
+        exercise_id = data["ids"][-1]  # Get the last exercise in the database
+        
+        status_code = 200
+        
+        # When
+        res = self.client().get(f"/exercises/{exercise_id}")
+        data = json.loads(res.data)
 
+        # Then
+        self.assertEqual(res.status_code, status_code)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['id'])
+        self.assertTrue(data['question'])
+        self.assertTrue(data['answer'])
+        
+    def test_404_get_exercise_invalid_id(self):
+        """Test get specific exercise fails when the exercise_id is invalid"""
+        # Given
+        exercise_id = 999999999
+        status_code = 404
+        message = self.message_404
+
+        # When
+        res = self.client().get(f"/exercises/{exercise_id}")
+        data = json.loads(res.data)
+
+        # Then
+        self.assertEqual(res.status_code, status_code)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], message)
+        
     def test_delete_exercise(self):
         """Test delete exercise"""
         # Given
@@ -68,7 +104,7 @@ class AppTestCase(unittest.TestCase):
         message = self.message_404
 
         # When
-        res = self.client().delete(f"/questions/{exercise_id}")
+        res = self.client().delete(f"/exercises/{exercise_id}")
         data = json.loads(res.data)
 
         # Then
@@ -76,8 +112,8 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], message)
 
-    def test_post_exercise(self):
-        """Test post exercise"""
+    def test_create_exercise(self):
+        """Test create exercise"""
         # Given
         question = "Test question"
         answer = "Test answer"
@@ -97,8 +133,8 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data["question"], question)
         self.assertEqual(data["answer"], answer)
 
-    def test_422_post_exercise_fails_missing_exercise(self):
-        """Test post exercise fails when the question is missing"""
+    def test_422_create_exercise_fails_missing_exercise(self):
+        """Test create exercise fails when the question is missing"""
         # Given
         question = ""
         answer = "Answer"
@@ -118,8 +154,8 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], message)
 
-    def test_422_post_exercise_fails_missing_answer(self):
-        """Test post exercise fails when the answer is missing"""
+    def test_422_create_exercise_fails_missing_answer(self):
+        """Test create exercise fails when the answer is missing"""
         # Given
         question = "Question"
         answer = ""
