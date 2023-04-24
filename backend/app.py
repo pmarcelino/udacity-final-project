@@ -7,29 +7,6 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from models import setup_db, Exercise, db
 
-EXERCISES_PER_PAGE = 10
-
-# def paginate_exercises(request, selection):
-#     """Get a list of exercises based on the given page number.
-
-#     Args:
-#         request (object): The request object
-#         selection (list): List of exercises
-
-#     Returns:
-#         current_exercises (list): Current page's exercises
-
-#     """
-#     page = request.args.get("page", 1, type=int)
-#     start = (page - 1) * EXERCISES_PER_PAGE
-#     end = start + EXERCISES_PER_PAGE
-
-#     exercises = [exercise.format() for exercise in selection]
-
-#     current_exercises = exercises[start:end]
-
-#     return current_exercises
-
 def create_app(test_config=None):
     """Create Flask app.
 
@@ -41,7 +18,7 @@ def create_app(test_config=None):
 
     """
     app = Flask(__name__)
-    migrate = Migrate(app, db)
+    Migrate(app, db)
 
     if test_config:
         app.config.from_mapping(test_config)
@@ -67,7 +44,8 @@ def create_app(test_config=None):
         return response
     
     @app.route("/exercises")
-    def get_exercises():
+    @requires_auth("get:exercises")
+    def get_exercises(payload):
         """Gets all exercises from the database and returns them as JSON"""
         exercises = Exercise.query.all()
         
@@ -80,10 +58,27 @@ def create_app(test_config=None):
                         "questions": questions,
                         "answers": answers,
                         "total_exercises": len(exercises)})
+        
+    @app.route("/exercises/<int:exercise_id>")
+    def get_exercise(exercise_id):
+        """Gets a specific exercise from the database and returns it as JSON"""
+        exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
+        
+        if exercise is None:
+            abort(404)
+        
+        question = exercise.question
+        answer = exercise.answer
+        
+        return jsonify({"success": True,
+                        "id": exercise_id,
+                        "question": question,
+                        "answer": answer})
 
     @app.route("/exercises/<int:exercise_id>", methods=["PUT"])
-    def update_exercise(exercise_id):
-
+    @requires_auth("put:exercise")
+    def update_exercise(payload, exercise_id):
+        """Updates an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
         if exercise is None:
@@ -112,7 +107,8 @@ def create_app(test_config=None):
                         "updated_exercise": exercise_id})
         
     @app.route("/exercises/<int:exercise_id>", methods=["DELETE"])
-    def delete_exercise(exercise_id):
+    @requires_auth("delete:exercise")
+    def delete_exercise(payload, exercise_id):
         """Deletes an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
@@ -131,7 +127,9 @@ def create_app(test_config=None):
                         "deleted_exercise": exercise_id})
         
     @app.route("/exercises", methods=["POST"])
-    def post_exercise():
+    @requires_auth("post:exercise")
+    def post_exercise(payload):
+        """Adds a new exercise to the database"""
         body = request.get_json()
         question = body.get("question", None)
         answer = body.get("answer", None)
