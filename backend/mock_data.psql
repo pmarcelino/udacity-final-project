@@ -1,0 +1,15 @@
+-- exercises
+INSERT INTO exercises (question, answer) VALUES
+('What is the capital of France?', 'Paris'),
+('What is the square root of 81?', '9'),
+('Which planet is closest to the Sun?', 'Mercury'),
+('How many continents are there?', '7'),
+('What is the largest mammal?', 'Blue Whale');
+
+-- users
+INSERT INTO users (email, auth0_id) VALUES
+('john.doe@example.com', 'auth0|1234567890'),
+('jane.doe@example.com', 'auth0|0987654321'),
+('alice.smith@example.com', 'auth0|1357924680'),
+('bob.jones@example.com', 'auth0|2468135790'),
+('charlie.brown@example.com', 'auth0|8642097531');

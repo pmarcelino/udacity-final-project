@@ -128,10 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Alembic
-/alembic/versions/*
-/alembic/versions/README
-/alembic.ini
-
 # Study
 NOTES.MD
