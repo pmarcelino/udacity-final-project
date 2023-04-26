@@ -1,4 +1,5 @@
 import React from "react";
+import AuthenticationButton from "./AuthenticationButton";
 
 const Header = () => {
   return (
@@ -8,6 +9,7 @@ const Header = () => {
           <a className="navbar-brand" href="https://www.google.com">
             Exercise App
           </a>
+          <AuthenticationButton />
         </div>
       </nav>
     </header>
