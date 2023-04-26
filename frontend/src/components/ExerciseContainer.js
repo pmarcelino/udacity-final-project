@@ -6,10 +6,14 @@ const ExerciseContainer = () => {
   const [exerciseID, setExerciseID] = useState("");
   const [exerciseQuestion, setExerciseQuestion] = useState("");
   const [exerciseAnswer, setExerciseAnswer] = useState("");
-  const { selectedExerciseID } = useContext(ExerciseContext);
-  const { setSelectedExerciseID } = useContext(ExerciseContext);
   const [showAnswer, setShowAnswer] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
+  const {
+    selectedExerciseID,
+    setSelectedExerciseID,
+    exerciseIDs,
+    setExerciseIDs,
+  } = useContext(ExerciseContext);
 
   // Get random exercise ID from the backend
   useEffect(() => {
@@ -64,33 +68,30 @@ const ExerciseContainer = () => {
 
   // Delete exercise
   const deleteExercise = async () => {
-    try {
-      const token = await getAccessTokenSilently();
+    const token = await getAccessTokenSilently();
 
-      console.log(token);
+    console.log(token);
 
-      fetch(`http://localhost:5000/exercises/${exerciseID}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    fetch(`http://localhost:5000/exercises/${exerciseID}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.log(response);
+          throw new Error("Error deleting exercise");
+        }
+        return response.json();
       })
-        .then((response) => {
-          if (!response.json()) {
-            throw new Error("Error deleting exercise");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-          nextExercise();
-        })
-        .catch((error) => {
-          console.error("Error deleting exercise:", error);
-        });
-    } catch (error) {
-      console.error("Error getting access token: ", error);
-    }
+      .then((data) => {
+        setExerciseIDs(exerciseIDs.filter((id) => id !== exerciseID));
+        nextExercise();
+      })
+      .catch((error) => {
+        console.error("Error deleting exercise:", error);
+      });
   };
 
   // Toggle answer

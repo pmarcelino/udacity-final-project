@@ -10,6 +10,7 @@ import Loading from "./components/Loading";
 
 function App() {
   const [selectedExerciseID, setSelectedExerciseID] = useState(null);
+  const [exerciseIDs, setExerciseIDs] = useState([]);
   const { isLoading } = useAuth0();
 
   if (isLoading) {
@@ -18,7 +19,12 @@ function App() {
 
   return (
     <ExerciseContext.Provider
-      value={{ selectedExerciseID, setSelectedExerciseID }}
+      value={{
+        selectedExerciseID,
+        setSelectedExerciseID,
+        exerciseIDs,
+        setExerciseIDs,
+      }}
     >
       <div className="App">
         <Header />
