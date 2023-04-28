@@ -11,7 +11,7 @@ const Sidebar = () => {
       .then((data) => {
         setExerciseIDs(data.ids);
       });
-  }, []);
+  }, [setExerciseIDs]);
 
   return (
     <nav className="nav flex-column">

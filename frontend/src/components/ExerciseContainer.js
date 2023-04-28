@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import ExerciseContext from "./ExerciseContext";
 import { useAuth0 } from "@auth0/auth0-react";
+import jwtDecode from "jwt-decode";
 
 const ExerciseContainer = () => {
+  const [permissions, setPermissions] = useState([]);
   const [exerciseID, setExerciseID] = useState("");
   const [exerciseQuestion, setExerciseQuestion] = useState("");
   const [exerciseAnswer, setExerciseAnswer] = useState("");
@@ -14,6 +16,22 @@ const ExerciseContainer = () => {
     exerciseIDs,
     setExerciseIDs,
   } = useContext(ExerciseContext);
+
+  // Fetch the Access Token and decode the permissions
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const decodedToken = jwtDecode(token);
+        const tokenPermissions = decodedToken[`permissions`] || [];
+        setPermissions(tokenPermissions);
+      } catch (error) {
+        console.error("Error fetching Access Token:", error);
+      }
+    })();
+  }, [getAccessTokenSilently]);
+
+  const canDeleteExercise = permissions.includes("delete:exercise");
 
   // Get random exercise ID from the backend
   useEffect(() => {
@@ -70,8 +88,6 @@ const ExerciseContainer = () => {
   const deleteExercise = async () => {
     const token = await getAccessTokenSilently();
 
-    console.log(token);
-
     fetch(`http://localhost:5000/exercises/${exerciseID}`, {
       method: "DELETE",
       headers: {
@@ -80,7 +96,6 @@ const ExerciseContainer = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          console.log(response);
           throw new Error("Error deleting exercise");
         }
         return response.json();
@@ -120,9 +135,11 @@ const ExerciseContainer = () => {
           <div className="col">
             <button className="btn btn-success me-2">Add</button>
             <button className="btn btn-warning me-2">Edit</button>
-            <button className="btn btn-danger" onClick={deleteExercise}>
-              Delete
-            </button>
+            {canDeleteExercise && (
+              <button className="btn btn-danger" onClick={deleteExercise}>
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>
