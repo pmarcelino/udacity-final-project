@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import ExerciseContext from "./ExerciseContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import jwtDecode from "jwt-decode";
+import { Popup } from "./Popup";
 
 const ExerciseContainer = () => {
   const [permissions, setPermissions] = useState([]);
@@ -16,6 +17,7 @@ const ExerciseContainer = () => {
     exerciseIDs,
     setExerciseIDs,
   } = useContext(ExerciseContext);
+  const [open, setOpen] = useState(false);
 
   // Fetch the Access Token and decode the permissions
   useEffect(() => {
@@ -133,7 +135,15 @@ const ExerciseContainer = () => {
         {/* Admin-only buttons */}
         <div className="row mt-3">
           <div className="col">
-            <button className="btn btn-success me-2">Add</button>
+            <button
+              className="btn btn-success me-2"
+              onClick={() => setOpen(true)}
+            >
+              Add
+            </button>
+            {open ? (
+              <Popup text="Add Exercise" closePopup={() => setOpen(false)} />
+            ) : null}
             <button className="btn btn-warning me-2">Edit</button>
             {canDeleteExercise && (
               <button className="btn btn-danger" onClick={deleteExercise}>
