@@ -91,8 +91,8 @@ const ExerciseContainer = () => {
       const data = await response.json();
 
       const nextIndex = data.ids.indexOf(exerciseID) + 1;
-      const maxIndex = Math.max(...data.ids) - 1;
-      const minIndex = Math.min(...data.ids) - 1;
+      const maxIndex = data.ids.length - 1;
+      const minIndex = 0;
       const index = nextIndex > maxIndex ? minIndex : nextIndex;
       const nextID = data.ids[index];
 
