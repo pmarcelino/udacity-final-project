@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import ExerciseContext from "./ExerciseContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import jwtDecode from "jwt-decode";
@@ -21,106 +21,141 @@ const ExerciseContainer = () => {
 
   // Fetch the Access Token and decode the permissions
   useEffect(() => {
-    (async () => {
+    const fetchAccessToken = async () => {
       try {
         const token = await getAccessTokenSilently();
         const decodedToken = jwtDecode(token);
-        const tokenPermissions = decodedToken[`permissions`] || [];
+        const tokenPermissions = decodedToken["permissions"] || [];
         setPermissions(tokenPermissions);
       } catch (error) {
         console.error("Error fetching Access Token:", error);
       }
-    })();
+    };
+
+    fetchAccessToken();
   }, [getAccessTokenSilently]);
 
   const canDeleteExercise = permissions.includes("delete:exercise");
 
   // Get random exercise ID from the backend
   useEffect(() => {
-    fetch("http://localhost:5000/exercises")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchRandomExercise = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/exercises");
+        const data = await response.json();
         const randomIndex = Math.floor(Math.random() * data.ids.length);
         const randomID = data.ids[randomIndex];
 
-        fetch(`http://localhost:5000/exercises/${randomID}`)
-          .then((response) => response.json())
-          .then((exerciseData) => {
-            setExerciseID(exerciseData.id);
-            setExerciseQuestion(exerciseData.question);
-            setExerciseAnswer(exerciseData.answer);
-          });
-      });
-  }, []);
+        const exerciseResponse = await fetch(
+          `http://localhost:5000/exercises/${randomID}`
+        );
+        const exerciseData = await exerciseResponse.json();
 
-  // Get specific exercise ID from the backend
-  if (selectedExerciseID) {
-    fetch(`http://localhost:5000/exercises/${selectedExerciseID}`)
-      .then((response) => response.json())
-      .then((exerciseData) => {
         setExerciseID(exerciseData.id);
         setExerciseQuestion(exerciseData.question);
         setExerciseAnswer(exerciseData.answer);
-      });
-  }
+      } catch (error) {
+        console.error("Error fetching random exercise:", error);
+      }
+    };
+
+    fetchRandomExercise();
+  }, []);
+
+  // Get specific exercise ID from the backend
+  const fetchSpecificExercise = useCallback(async (selectedExerciseID) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/exercises/${selectedExerciseID}`
+      );
+      const exerciseData = await response.json();
+
+      setExerciseID(exerciseData.id);
+      setExerciseQuestion(exerciseData.question);
+      setExerciseAnswer(exerciseData.answer);
+    } catch (error) {
+      console.error("Error fetching specific exercise:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedExerciseID) {
+      fetchSpecificExercise(selectedExerciseID);
+    }
+  }, [selectedExerciseID, fetchSpecificExercise]);
 
   // Go to the next exercise
-  const nextExercise = () => {
-    fetch("http://localhost:5000/exercises")
-      .then((response) => response.json())
-      .then((data) => {
-        const nextIndex = data.ids.indexOf(exerciseID) + 1;
-        const maxIndex = Math.max(...data.ids) - 1;
-        const minIndex = Math.min(...data.ids) - 1;
-        const index = nextIndex > maxIndex ? minIndex : nextIndex;
-        const nextID = data.ids[index];
+  const nextExercise = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:5000/exercises");
+      const data = await response.json();
 
-        fetch(`http://localhost:5000/exercises/${nextID}`)
-          .then((response) => response.json())
-          .then((exerciseData) => {
-            setExerciseID(exerciseData.id);
-            setExerciseQuestion(exerciseData.question);
-            setExerciseAnswer(exerciseData.answer);
-            setSelectedExerciseID(exerciseData.id);
-          });
-      });
-  };
+      const nextIndex = data.ids.indexOf(exerciseID) + 1;
+      const maxIndex = Math.max(...data.ids) - 1;
+      const minIndex = Math.min(...data.ids) - 1;
+      const index = nextIndex > maxIndex ? minIndex : nextIndex;
+      const nextID = data.ids[index];
+
+      const exerciseResponse = await fetch(
+        `http://localhost:5000/exercises/${nextID}`
+      );
+      const exerciseData = await exerciseResponse.json();
+
+      setExerciseID(exerciseData.id);
+      setExerciseQuestion(exerciseData.question);
+      setExerciseAnswer(exerciseData.answer);
+      setSelectedExerciseID(exerciseData.id);
+    } catch (error) {
+      console.error("Error fetching next exercise:", error);
+    }
+  }, [
+    exerciseID,
+    setExerciseID,
+    setExerciseQuestion,
+    setExerciseAnswer,
+    setSelectedExerciseID,
+  ]);
 
   // Add exercise
-  const addExerciseID = (newExerciseID) => {
-    setExerciseIDs([...exerciseIDs, newExerciseID]);
+  const addExercise = (newExercise) => {
+    setExerciseIDs([...exerciseIDs, newExercise.id]);
+    setSelectedExerciseID(newExercise.id);
   };
 
   // Delete exercise
-  const deleteExercise = async () => {
-    const token = await getAccessTokenSilently();
+  const deleteExercise = useCallback(async () => {
+    try {
+      const token = await getAccessTokenSilently();
 
-    fetch(`http://localhost:5000/exercises/${exerciseID}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error deleting exercise");
+      const response = await fetch(
+        `http://localhost:5000/exercises/${exerciseID}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        return response.json();
-      })
-      .then((data) => {
-        setExerciseIDs(exerciseIDs.filter((id) => id !== exerciseID));
-        nextExercise();
-      })
-      .catch((error) => {
-        console.error("Error deleting exercise:", error);
-      });
-  };
+      );
+
+      if (!response.ok) {
+        throw new Error("Error deleting exercise");
+      }
+
+      const data = await response.json();
+
+      setExerciseIDs(exerciseIDs.filter((id) => id !== exerciseID));
+      nextExercise();
+    } catch (error) {
+      console.error("Error deleting exercise:", error);
+    }
+  }, [exerciseID, exerciseIDs, setExerciseIDs, nextExercise]);
 
   // Toggle answer
   const toggleAnswer = () => {
     setShowAnswer(!showAnswer);
   };
 
+  // Render the exercise container
   return (
     <div className="exercise-container">
       <h2>Exercise {exerciseID}</h2>
@@ -150,7 +185,7 @@ const ExerciseContainer = () => {
               <Popup
                 text="Add Exercise"
                 closePopup={() => setOpen(false)}
-                addExerciseID={addExerciseID}
+                addExercise={addExercise}
               />
             ) : null}
             <button className="btn btn-warning me-2">Edit</button>

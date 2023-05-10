@@ -1,63 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 // Popup component definition
-export const Popup = ({ closePopup, addExerciseID }) => {
-  // Local state management using useState hook
+export const Popup = ({ closePopup, addExercise }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
-  // Access the Auth0 hook to get the getAccessTokenSilently function
   const { getAccessTokenSilently } = useAuth0();
 
-  // Form submit handler
-  const handleSubmit = async (e) => {
-    // Prevent default form submission behavior
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    // Obtain the access token from Auth0
-    const token = await getAccessTokenSilently();
+      try {
+        const token = await getAccessTokenSilently();
 
-    // Prepare the payload with question and answer
-    const payload = {
-      question: question,
-      answer: answer,
-    };
+        const payload = {
+          question: question,
+          answer: answer,
+        };
 
-    try {
-      // Send a POST request to the API with the payload and access token
-      const response = await fetch("http://localhost:5000/exercises", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch("http://localhost:5000/exercises", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
 
-      // Check for successful response
-      if (!response.ok) {
-        throw new Error("Error adding exercise");
+        if (!response.ok) {
+          throw new Error("Error adding exercise");
+        }
+
+        const data = await response.json();
+
+        setQuestion("");
+        setAnswer("");
+        addExercise(data);
+        setShowSuccessMessage(true);
+      } catch (error) {
+        console.error("Error adding exercise:", error);
       }
+    },
+    [getAccessTokenSilently, question, answer, addExercise]
+  );
 
-      // Process the response
-      const data = await response.json();
-
-      // Reset form fields and display success message
-      setQuestion("");
-      setAnswer("");
-
-      // Call the addExerciseID function to update the exerciseIDs state in the parent component
-      addExerciseID(data.id);
-
-      // Show success message and close button
-      setShowSuccessMessage(true);
-    } catch (error) {
-      // Log any errors
-      console.error("Error adding exercise:", error);
-    }
-  };
+  const handleClose = useCallback(() => {
+    setShowSuccessMessage(false);
+    closePopup();
+  }, [closePopup]);
 
   // Render the component
   return (
@@ -68,7 +60,7 @@ export const Popup = ({ closePopup, addExerciseID }) => {
         {showSuccessMessage ? (
           <div>
             <p>Exercise added successfully!</p>
-            <button className="btn btn-primary" onClick={closePopup}>
+            <button className="btn btn-primary" onClick={handleClose}>
               Close
             </button>
           </div>
@@ -101,7 +93,7 @@ export const Popup = ({ closePopup, addExerciseID }) => {
             <button className="btn btn-success" type="submit">
               Submit
             </button>
-            <button className="btn btn-danger" onClick={closePopup}>
+            <button className="btn btn-danger" onClick={{ handleClose }}>
               Close
             </button>
           </form>
