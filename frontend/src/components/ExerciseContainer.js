@@ -86,6 +86,11 @@ const ExerciseContainer = () => {
       });
   };
 
+  // Add exercise
+  const addExerciseID = (newExerciseID) => {
+    setExerciseIDs([...exerciseIDs, newExerciseID]);
+  };
+
   // Delete exercise
   const deleteExercise = async () => {
     const token = await getAccessTokenSilently();
@@ -142,7 +147,11 @@ const ExerciseContainer = () => {
               Add
             </button>
             {open ? (
-              <Popup text="Add Exercise" closePopup={() => setOpen(false)} />
+              <Popup
+                text="Add Exercise"
+                closePopup={() => setOpen(false)}
+                addExerciseID={addExerciseID}
+              />
             ) : null}
             <button className="btn btn-warning me-2">Edit</button>
             {canDeleteExercise && (
