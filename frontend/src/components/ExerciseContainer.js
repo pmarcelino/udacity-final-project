@@ -85,36 +85,46 @@ const ExerciseContainer = () => {
   }, [selectedExerciseID, fetchSpecificExercise]);
 
   // Go to the next exercise
-  const nextExercise = useCallback(async () => {
-    try {
-      const response = await fetch("http://localhost:5000/exercises");
-      const data = await response.json();
+  const nextExercise = useCallback(
+    async (nextIndex = null) => {
+      try {
+        const response = await fetch("http://localhost:5000/exercises");
+        const data = await response.json();
 
-      const nextIndex = data.ids.indexOf(exerciseID) + 1;
-      const maxIndex = data.ids.length - 1;
-      const minIndex = 0;
-      const index = nextIndex > maxIndex ? minIndex : nextIndex;
-      const nextID = data.ids[index];
+        // If nextIndex wasn't passed, calculate it
+        if (nextIndex === null) {
+          console.log("here");
+          nextIndex = data.ids.indexOf(exerciseID) + 1;
+        }
 
-      const exerciseResponse = await fetch(
-        `http://localhost:5000/exercises/${nextID}`
-      );
-      const exerciseData = await exerciseResponse.json();
+        console.log(nextIndex);
 
-      setExerciseID(exerciseData.id);
-      setExerciseQuestion(exerciseData.question);
-      setExerciseAnswer(exerciseData.answer);
-      setSelectedExerciseID(exerciseData.id);
-    } catch (error) {
-      console.error("Error fetching next exercise:", error);
-    }
-  }, [
-    exerciseID,
-    setExerciseID,
-    setExerciseQuestion,
-    setExerciseAnswer,
-    setSelectedExerciseID,
-  ]);
+        const maxIndex = data.ids.length - 1;
+        const minIndex = 0;
+        const index = nextIndex > maxIndex ? minIndex : nextIndex;
+        const nextID = data.ids[index];
+
+        const exerciseResponse = await fetch(
+          `http://localhost:5000/exercises/${nextID}`
+        );
+        const exerciseData = await exerciseResponse.json();
+
+        setExerciseID(exerciseData.id);
+        setExerciseQuestion(exerciseData.question);
+        setExerciseAnswer(exerciseData.answer);
+        setSelectedExerciseID(exerciseData.id);
+      } catch (error) {
+        console.error("Error fetching next exercise:", error);
+      }
+    },
+    [
+      exerciseID,
+      setExerciseID,
+      setExerciseQuestion,
+      setExerciseAnswer,
+      setSelectedExerciseID,
+    ]
+  );
 
   // Add exercise
   const addExercise = (newExercise) => {
@@ -126,6 +136,13 @@ const ExerciseContainer = () => {
   const deleteExercise = useCallback(async () => {
     try {
       const token = await getAccessTokenSilently();
+
+      // Save the nextIndex before deleting the current exercise
+      const responseBeforeDelete = await fetch(
+        "http://localhost:5000/exercises"
+      );
+      const dataBeforeDelete = await responseBeforeDelete.json();
+      const nextIndexBeforeDelete = dataBeforeDelete.ids.indexOf(exerciseID);
 
       const response = await fetch(
         `http://localhost:5000/exercises/${exerciseID}`,
@@ -141,14 +158,18 @@ const ExerciseContainer = () => {
         throw new Error("Error deleting exercise");
       }
 
-      const data = await response.json();
-
       setExerciseIDs(exerciseIDs.filter((id) => id !== exerciseID));
-      nextExercise();
+      nextExercise(nextIndexBeforeDelete);
     } catch (error) {
       console.error("Error deleting exercise:", error);
     }
-  }, [exerciseID, exerciseIDs, setExerciseIDs, nextExercise]);
+  }, [
+    getAccessTokenSilently,
+    exerciseID,
+    setExerciseIDs,
+    exerciseIDs,
+    nextExercise,
+  ]);
 
   // Toggle answer
   const toggleAnswer = () => {
@@ -167,8 +188,8 @@ const ExerciseContainer = () => {
             <button className="btn btn-primary me-2" onClick={toggleAnswer}>
               {showAnswer ? "Hide" : "Show"} Answer
             </button>
-            <button className="btn btn-primary" onClick={nextExercise}>
-              Next Question
+            <button className="btn btn-primary" onClick={() => nextExercise()}>
+              Next Exercise
             </button>
           </div>
         </div>
