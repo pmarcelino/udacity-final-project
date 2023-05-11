@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import ExerciseContext from "./ExerciseContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import jwtDecode from "jwt-decode";
-import { Popup } from "./Popup";
+import { AddExercise } from "./AddExercise";
+import { EditExercise } from "./EditExercise";
 
 const ExerciseContainer = () => {
   const [permissions, setPermissions] = useState([]);
@@ -17,7 +18,8 @@ const ExerciseContainer = () => {
     exerciseIDs,
     setExerciseIDs,
   } = useContext(ExerciseContext);
-  const [open, setOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   // Fetch the Access Token and decode the permissions
   useEffect(() => {
@@ -35,6 +37,8 @@ const ExerciseContainer = () => {
     fetchAccessToken();
   }, [getAccessTokenSilently]);
 
+  const canAddExercise = permissions.includes("post:exercise");
+  const canEditExercise = permissions.includes("put:exercise");
   const canDeleteExercise = permissions.includes("delete:exercise");
 
   // Get random exercise ID from the backend
@@ -132,6 +136,12 @@ const ExerciseContainer = () => {
     setSelectedExerciseID(newExercise.id);
   };
 
+  // Edit exercise
+  const editExercise = (editedExercise) => {
+    setExerciseQuestion(editedExercise.question);
+    setExerciseAnswer(editedExercise.answer);
+  };
+
   // Delete exercise
   const deleteExercise = useCallback(async () => {
     try {
@@ -196,20 +206,37 @@ const ExerciseContainer = () => {
         {/* Admin-only buttons */}
         <div className="row mt-3">
           <div className="col">
-            <button
-              className="btn btn-success me-2"
-              onClick={() => setOpen(true)}
-            >
-              Add
-            </button>
-            {open ? (
-              <Popup
+            {canAddExercise && (
+              <button
+                className="btn btn-success me-2"
+                onClick={() => setAddOpen(true)}
+              >
+                Add
+              </button>
+            )}
+            {canAddExercise && addOpen ? (
+              <AddExercise
                 text="Add Exercise"
-                closePopup={() => setOpen(false)}
+                closePopup={() => setAddOpen(false)}
                 addExercise={addExercise}
               />
             ) : null}
-            <button className="btn btn-warning me-2">Edit</button>
+            {canEditExercise && (
+              <button
+                className="btn btn-warning me-2"
+                onClick={() => setEditOpen(true)}
+              >
+                Edit
+              </button>
+            )}
+            {canEditExercise && editOpen ? (
+              <EditExercise
+                text="Edit Exercise"
+                closePopup={() => setEditOpen(false)}
+                editExercise={editExercise}
+                exerciseID={exerciseID}
+              />
+            ) : null}
             {canDeleteExercise && (
               <button className="btn btn-danger" onClick={deleteExercise}>
                 Delete

@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-// Popup component definition
-export const Popup = ({ closePopup, addExercise }) => {
+// AddExercise component definition
+export const AddExercise = ({ closePopup, addExercise }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -93,7 +93,11 @@ export const Popup = ({ closePopup, addExercise }) => {
             <button className="btn btn-success" type="submit">
               Submit
             </button>
-            <button className="btn btn-danger" onClick={{ handleClose }}>
+            <button
+              className="btn btn-danger"
+              type="button"
+              onClick={handleClose}
+            >
               Close
             </button>
           </form>
