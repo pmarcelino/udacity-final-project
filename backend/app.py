@@ -47,8 +47,6 @@ def create_app(test_config=None):
         return response
 
     @app.route("/exercises")
-    # @requires_auth("get:exercises")
-    # def get_exercises(payload):
     def get_exercises():
         """Gets all exercises from the database and returns them as JSON"""
         exercises = Exercise.query.all()
