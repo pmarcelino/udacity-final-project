@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 // EditExercise component definition
@@ -8,6 +8,26 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
 
+  // Get answer and question from the backend
+  useEffect(() => {
+    const fetchExercise = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/exercises/${exerciseID}`
+        );
+        const data = await response.json();
+
+        setQuestion(data.question);
+        setAnswer(data.answer);
+      } catch (error) {
+        console.error("Error fetching exercise:", error);
+      }
+    };
+
+    fetchExercise();
+  }, [exerciseID]);
+
+  // Handle submit function
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -49,19 +69,10 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
     [getAccessTokenSilently, question, answer, exerciseID, editExercise]
   );
 
-  // const handleClose = useCallback(() => {
-  //   setShowSuccessMessage(false);
-  //   closePopup();
-  // }, [closePopup]);
-
-  const handleClose = useCallback(
-    (e) => {
-      e.preventDefault();
-      setShowSuccessMessage(false);
-      closePopup();
-    },
-    [closePopup]
-  );
+  const handleClose = useCallback(() => {
+    setShowSuccessMessage(false);
+    closePopup();
+  }, [closePopup]);
 
   // Render the component
   return (
