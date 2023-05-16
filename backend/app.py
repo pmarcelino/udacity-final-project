@@ -19,7 +19,6 @@ def create_app(test_config=None):
 
     """
     app = Flask(__name__)
-    Migrate(app, db)
 
     if test_config:
         app.config.from_mapping(test_config)
@@ -33,6 +32,7 @@ def create_app(test_config=None):
         app.config.from_mapping(config)
 
     setup_db(app)
+    Migrate(app, db)
 
     CORS(app)
 
@@ -201,3 +201,8 @@ def create_app(test_config=None):
         )
 
     return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run()
