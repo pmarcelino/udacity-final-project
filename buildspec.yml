@@ -23,26 +23,26 @@ phases:
   pre_build:
     commands:
       - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend_kubernetes.yml
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI_FRONTEND
+      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI_BACKEND
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI_FRONTEND
       - export KUBECONFIG=$HOME/.kube/config
       - echo `ls -l`
   build:
     commands:
-      - docker build -f ./backend/Dockerfile --tag $REPOSITORY_URI_FRONTEND:$TAG ./backend
-      - docker build -f ./frontend/Dockerfile --tag $REPOSITORY_URI_BACKEND:$TAG ./frontend
+      - docker build -f ./backend/Dockerfile --tag $REPOSITORY_URI_BACKEND:$TAG ./backend
+      - docker build -f ./frontend/Dockerfile --tag $REPOSITORY_URI_FRONTEND:$TAG ./frontend
   post_build:
     commands:
-      - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - docker push $REPOSITORY_URI_BACKEND:$TAG
+      - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - kubectl apply -f frontend_kubernetes.yml
       - kubectl apply -f backend_kubernetes.yml
-      - printf '[{"name":"frontend","imageUri":"%s"},{"name":"backend","imageUri":"% s"}]' $REPOSITORY_URI_FRONTEND:$TAG $REPOSITORY_URI_BACKEND:$TAG > build.json
+      - kubectl apply -f frontend_kubernetes.yml
+      - printf '[{"name":"backend","imageUri":"% s"},{"name":"frontend","imageUri":"%s"}]' $REPOSITORY_URI_FRONTEND:$TAG $REPOSITORY_URI_BACKEND:$TAG > build.json
 artifacts:
   files: build.json
 env:
