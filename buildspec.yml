@@ -25,6 +25,9 @@ phases:
       - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
+      - echo $AWS_DEFAULT_REGION
+      - echo $REPOSITORY_URI_BACKEND
+      - echo $REPOSITORY_URI_FRONTEND
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI_BACKEND
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI_FRONTEND
       - export KUBECONFIG=$HOME/.kube/config
