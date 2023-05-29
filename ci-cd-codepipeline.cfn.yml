@@ -309,7 +309,7 @@ Resources:
         Type: LINUX_CONTAINER
         Image: !Ref CodeBuildDockerImage
         EnvironmentVariables:
-          - Name: REPOSITORY_URI
+          - Name: REPOSITORY_URI_BACKEND
             Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrDockerRepository}
           - Name: REPOSITORY_NAME
             Value: !Ref GitSourceRepo
