@@ -99,7 +99,11 @@ Metadata:
         default: EKS cluster name
 
 Resources:
-  EcrDockerRepository:
+  BackendEcrDockerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+
+  FrontendEcrDockerRepository:
     Type: AWS::ECR::Repository
     DeletionPolicy: Retain
 
@@ -286,7 +290,17 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:GetObjectVersion
-              - Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrDockerRepository}
+              - Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${BackendEcrDockerRepository}
+                Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+              - Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${FrontendEcrDockerRepository}
                 Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
@@ -310,7 +324,9 @@ Resources:
         Image: !Ref CodeBuildDockerImage
         EnvironmentVariables:
           - Name: REPOSITORY_URI_BACKEND
-            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrDockerRepository}
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${BackendEcrDockerRepository}
+          - Name: REPOSITORY_URI_FRONTEND
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${FrontendEcrDockerRepository}
           - Name: REPOSITORY_NAME
             Value: !Ref GitSourceRepo
           - Name: REPOSITORY_BRANCH
