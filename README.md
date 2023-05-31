@@ -69,4 +69,4 @@ There are currently no known issues with the Math App. If you encounter any prob
 
 ## Resources
 
-No additional resources or references are available.
+No additional resources or references are available at this time.
