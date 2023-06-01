@@ -259,7 +259,7 @@ Resources:
                 Effect: Allow
                 Action:
                   - eks:Describe*
-              - Resource: "*"
+              - Resource: "arn:aws:ssm:us-east-2:196397744326:parameter/ALGORITHMS"
                 Effect: Allow
                 Action:
                   - ssm:GetParameters
