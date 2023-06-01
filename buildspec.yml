@@ -20,11 +20,12 @@ phases:
       - echo `kubectl version --short --client`
       - python -m pip install --upgrade --force pip
       - apt-get update && apt-get -y install jq  && pip install --upgrade awscli
+      - curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      - chmod +x /usr/local/bin/docker-compose
+      - docker-compose --version
   pre_build:
     commands:
       - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend_kubernetes.yml
-      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - echo $AWS_DEFAULT_REGION
       - echo $REPOSITORY_URI_BACKEND
       - echo $REPOSITORY_URI_FRONTEND
@@ -34,8 +35,9 @@ phases:
       - echo `ls -l`
   build:
     commands:
-      - docker build -f ./backend/Dockerfile --tag $REPOSITORY_URI_BACKEND:$TAG ./backend
-      - docker build -f ./frontend/Dockerfile --tag $REPOSITORY_URI_FRONTEND:$TAG ./frontend
+      - docker-compose build
+      - docker tag backend $REPOSITORY_URI_BACKEND:$TAG
+      - docker tag frontend $REPOSITORY_URI_FRONTEND:$TAG
   post_build:
     commands:
       - docker push $REPOSITORY_URI_BACKEND:$TAG
