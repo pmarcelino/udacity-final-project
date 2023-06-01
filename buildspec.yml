@@ -45,9 +45,9 @@ phases:
       - echo SECRET_KEY=$(aws ssm get-parameter --name SECRET_KEY --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo SQLALCHEMY_DATABASE_URI=$(aws ssm get-parameter --name SQLALCHEMY_DATABASE_URI --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo SQLALCHEMY_TRACK_MODIFICATIONS=$(aws ssm get-parameter --name SQLALCHEMY_TRACK_MODIFICATIONS --query 'Parameter.Value' --output text) >> backend/.env.docker
-      - echo REACT_APP_AUTH0_DOMAIN=$(aws ssm get-parameter --name REACT_APP_AUTH0_DOMAIN --query 'Parameter.Value' --output text) >> backend/.env.docker
-      - echo REACT_APP_AUTH0_CLIENT_ID=$(aws ssm get-parameter --name REACT_APP_AUTH0_CLIENT_ID --query 'Parameter.Value' --output text) >> backend/.env.docker
-      - echo REACT_APP_AUTH0_AUDIENCE=$(aws ssm get-parameter --name REACT_APP_AUTH0_AUDIENCE --query 'Parameter.Value' --output text) >> backend/.env.docker
+      - echo REACT_APP_AUTH0_DOMAIN=$(aws ssm get-parameter --name REACT_APP_AUTH0_DOMAIN --query 'Parameter.Value' --output text) > frontend/.env.docker
+      - echo REACT_APP_AUTH0_CLIENT_ID=$(aws ssm get-parameter --name REACT_APP_AUTH0_CLIENT_ID --query 'Parameter.Value' --output text) >> frontend/.env.docker
+      - echo REACT_APP_AUTH0_AUDIENCE=$(aws ssm get-parameter --name REACT_APP_AUTH0_AUDIENCE --query 'Parameter.Value' --output text) >> frontend/.env.docker
   build:
     commands:
       - docker-compose build
