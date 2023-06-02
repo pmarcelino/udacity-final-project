@@ -4,6 +4,7 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
+    image: backend
     volumes:
       - ./backend:/app/backend
     ports:
@@ -19,6 +20,7 @@ services:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
+    image: frontend
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules

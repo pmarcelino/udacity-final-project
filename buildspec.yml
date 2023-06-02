@@ -63,6 +63,7 @@ phases:
       - kubectl apply -f backend_kubernetes.yml
       - kubectl apply -f frontend_kubernetes.yml
       - rm backend/.env.docker
+      - rm frontend/.env.docker
       - printf '[{"name":"backend","imageUri":"% s"},{"name":"frontend","imageUri":"%s"}]' $REPOSITORY_URI_FRONTEND:$TAG $REPOSITORY_URI_BACKEND:$TAG > build.json
 artifacts:
   files: build.json
