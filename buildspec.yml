@@ -60,7 +60,9 @@ phases:
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
+      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend_kubernetes.yml
       - kubectl apply -f backend_kubernetes.yml
+      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - kubectl apply -f frontend_kubernetes.yml
       - rm backend/.env.docker
       - rm frontend/.env.docker
