@@ -55,6 +55,7 @@ phases:
       - docker tag frontend $REPOSITORY_URI_FRONTEND:$TAG
   post_build:
     commands:
+      - echo $SQLALCHEMY_DATABASE_URI
       - docker push $REPOSITORY_URI_BACKEND:$TAG
       - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - echo $EKS_CLUSTER_NAME
