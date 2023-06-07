@@ -55,7 +55,6 @@ phases:
       - docker tag frontend $REPOSITORY_URI_FRONTEND:$TAG
   post_build:
     commands:
-      - echo $SQLALCHEMY_DATABASE_URI
       - docker push $REPOSITORY_URI_BACKEND:$TAG
       - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - echo $EKS_CLUSTER_NAME
@@ -67,6 +66,7 @@ phases:
       - kubectl apply -f backend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - kubectl apply -f frontend_kubernetes.yml
+      - cat backend/.env.docker
       - rm backend/.env.docker
       - rm frontend/.env.docker
       - printf '[{"name":"backend","imageUri":"% s"},{"name":"frontend","imageUri":"%s"}]' $REPOSITORY_URI_FRONTEND:$TAG $REPOSITORY_URI_BACKEND:$TAG > build.json
