@@ -262,7 +262,7 @@ Resources:
               - Resource: "*"
                 Effect: Allow
                 Action:
-                  - ssm:GetParameters
+                  - ssm:GetParameter*
               - Resource: "*"
                 Effect: Allow
                 Action:
