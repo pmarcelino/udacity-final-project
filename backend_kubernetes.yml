@@ -15,6 +15,9 @@ spec:
       containers:
         - name: backend
           image: CONTAINER_IMAGE
+          env:
+            - name: SQLALCHEMY_DATABASE_URI
+              value: postgresql://postgres:postgres@db:5432/math
           ports:
             - containerPort: 5000
 
