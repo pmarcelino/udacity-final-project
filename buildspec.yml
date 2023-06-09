@@ -67,7 +67,6 @@ phases:
       - kubectl apply -f postgres-pvc.yaml
       - kubectl apply -f postgres_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend_kubernetes.yml
-
       - sed -i 's@VAR_SQLALCHEMY_DATABASE_URI@'"$SQLALCHEMY_DATABASE_URI"'@' backend_kubernetes.yml
       - sed -i 's@VAR_AUTH0_USERNAME@'"$AUTH0_USERNAME"'@' backend_kubernetes.yml
       - sed -i 's@VAR_AUTH0_PASSWORD@'"$AUTH0_PASSWORD"'@' backend_kubernetes.yml
@@ -80,7 +79,6 @@ phases:
       - sed -i 's@VAR_API_AUDIENCE@'"$API_AUDIENCE"'@' backend_kubernetes.yml
       - sed -i 's@VAR_SECRET_KEY@'"$SECRET_KEY"'@' backend_kubernetes.yml
       - sed -i 's@VAR_SQLALCHEMY_TRACK_MODIFICATIONS@'"$SQLALCHEMY_TRACK_MODIFICATIONS"'@' backend_kubernetes.yml
-
       - cat backend_kubernetes.yml
       - kubectl apply -f backend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
