@@ -18,14 +18,12 @@ spec:
         - name: frontend
           image: CONTAINER_IMAGE
           env:
-          - name: REACT_APP_AUTH0_DOMAIN
-            value: VAR_REACT_APP_AUTH0_DOMAIN
-          - name: REACT_APP_AUTH0_CLIENT_ID
-            value: VAR_REACT_APP_AUTH0_CLIENT_ID
-          - name: REACT_APP_AUTH0_AUDIENCE
-            value: VAR_REACT_APP_AUTH0_AUDIENCE
-          - name: REACT_APP_API_URL
-            value: backend-service/5000
+            - name: REACT_APP_AUTH0_DOMAIN
+              value: VAR_REACT_APP_AUTH0_DOMAIN
+            - name: REACT_APP_AUTH0_CLIENT_ID
+              value: VAR_REACT_APP_AUTH0_CLIENT_ID
+            - name: REACT_APP_AUTH0_AUDIENCE
+              value: VAR_REACT_APP_AUTH0_AUDIENCE
           ports:
             - containerPort: 3000
 
