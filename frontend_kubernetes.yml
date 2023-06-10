@@ -24,6 +24,8 @@ spec:
             value: VAR_REACT_APP_AUTH0_CLIENT_ID
           - name: REACT_APP_AUTH0_AUDIENCE
             value: VAR_REACT_APP_AUTH0_AUDIENCE
+          - name: REACT_APP_API_URL
+            value: backend-service/5000
           ports:
             - containerPort: 3000
 
