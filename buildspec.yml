@@ -86,6 +86,8 @@ phases:
       - kubectl apply -f backend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
       - kubectl apply -f frontend_kubernetes.yml
+      - kubectl apply -f cert-manager.yml
+      - kubectl apply -f ingress-resource.yml
       - cat backend/.env.docker
       - rm backend/.env.docker
       - rm frontend/.env.docker
