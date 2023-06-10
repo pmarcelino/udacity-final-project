@@ -18,8 +18,6 @@ spec:
           env:
             - name: SQLALCHEMY_DATABASE_URI
               value: VAR_SQLALCHEMY_DATABASE_URI
-            - name: SQLALCHEMY_DATABASE_URI
-            value: VAR_SQLALCHEMY_DATABASE_URI
             - name: AUTH0_USERNAME
             value: VAR_AUTH0_USERNAME
             - name: AUTH0_PASSWORD
