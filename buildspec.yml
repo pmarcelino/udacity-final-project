@@ -79,6 +79,9 @@ phases:
       - sed -i 's@VAR_API_AUDIENCE@'"$API_AUDIENCE"'@' backend_kubernetes.yml
       - sed -i 's@VAR_SECRET_KEY@'"$SECRET_KEY"'@' backend_kubernetes.yml
       - sed -i 's@VAR_SQLALCHEMY_TRACK_MODIFICATIONS@'"$SQLALCHEMY_TRACK_MODIFICATIONS"'@' backend_kubernetes.yml
+      - sed -i 's@VAR_REACT_APP_AUTH0_DOMAIN@'"$REACT_APP_AUTH0_DOMAIN"'@' frontend_kubernetes.yml
+      - sed -i 's@VAR_REACT_APP_AUTH0_CLIENT_ID@'"$REACT_APP_AUTH0_CLIENT_ID"'@' frontend_kubernetes.yml
+      - sed -i 's@VAR_REACT_APP_AUTH0_AUDIENCE@'"$REACT_APP_AUTH0_AUDIENCE"'@' frontend_kubernetes.yml
       - cat backend_kubernetes.yml
       - kubectl apply -f backend_kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend_kubernetes.yml
