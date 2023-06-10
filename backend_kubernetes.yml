@@ -39,7 +39,7 @@ spec:
           - name: SECRET_KEY
             value: VAR_SECRET_KEY
           - name: SQLALCHEMY_TRACK_MODIFICATIONS
-            value: VAR_SQLALCHEMY_TRACK_MODIFICATIONS
+            value: "VAR_SQLALCHEMY_TRACK_MODIFICATIONS"
           ports:
             - containerPort: 5000
 
