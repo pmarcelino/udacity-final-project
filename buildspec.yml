@@ -59,6 +59,7 @@ phases:
       - docker tag frontend $REPOSITORY_URI_FRONTEND:$TAG
   post_build:
     commands:
+      - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/aws/deploy.yaml
       - docker push $REPOSITORY_URI_BACKEND:$TAG
       - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - echo $EKS_CLUSTER_NAME
@@ -86,7 +87,7 @@ phases:
       - kubectl apply -f backend-kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_FRONTEND:$TAG"'@' frontend-kubernetes.yml
       - kubectl apply -f frontend-kubernetes.yml
-      - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/aws/deploy.yaml
+      - sleep 60
       - kubectl apply -f ingress.yml
       - cat backend/.env.docker
       - rm backend/.env.docker
