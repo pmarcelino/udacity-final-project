@@ -59,12 +59,12 @@ phases:
       - docker tag frontend $REPOSITORY_URI_FRONTEND:$TAG
   post_build:
     commands:
-      - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/aws/deploy.yaml
       - docker push $REPOSITORY_URI_BACKEND:$TAG
       - docker push $REPOSITORY_URI_FRONTEND:$TAG
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
+      - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/aws/deploy.yaml
       - kubectl apply -f postgres-pvc.yaml
       - kubectl apply -f postgres-kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend-kubernetes.yml
