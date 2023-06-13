@@ -18,12 +18,12 @@ spec:
         - name: frontend
           image: CONTAINER_IMAGE
           env:
-            - name: REACT_APP_AUTH0_DOMAIN
-              value: VAR_REACT_APP_AUTH0_DOMAIN
-            - name: REACT_APP_AUTH0_CLIENT_ID
-              value: VAR_REACT_APP_AUTH0_CLIENT_ID
-            - name: REACT_APP_AUTH0_AUDIENCE
-              value: VAR_REACT_APP_AUTH0_AUDIENCE
+          - name: REACT_APP_AUTH0_DOMAIN
+            value: VAR_REACT_APP_AUTH0_DOMAIN
+          - name: REACT_APP_AUTH0_CLIENT_ID
+            value: VAR_REACT_APP_AUTH0_CLIENT_ID
+          - name: REACT_APP_AUTH0_AUDIENCE
+            value: VAR_REACT_APP_AUTH0_AUDIENCE
           ports:
             - containerPort: 3000
 
@@ -32,11 +32,18 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-2:196397744326:certificate/7002d54c-868d-4fc4-842a-cd4694cf6d73
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
 spec:
   selector:
     app: frontend
   ports:
-    - protocol: TCP
+    - name: http
       port: 80
+      targetPort: 3000
+    - name: https
+      port: 443
       targetPort: 3000
   type: LoadBalancer
