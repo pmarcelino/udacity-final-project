@@ -10,7 +10,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
+      FLASK_ENV: development
     env_file:
       - ./backend/.env.docker
     depends_on:
@@ -27,7 +27,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://backend:5000
+      REACT_APP_API_URL: http://backend:5000
+      REACT_APP_AUTH0_DOMAIN: dev-k1vtlssj33h7vu2e.us.auth0.com
+      REACT_APP_AUTH0_CLIENT_ID: 0Vd23NIEYHJshBp92y4QICLUugQG3es
+      REACT_APP_AUTH0_AUDIENCE: https://api.math
     env_file:
       - ./frontend/.env.docker
     depends_on:
