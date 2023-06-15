@@ -6,7 +6,7 @@ const Sidebar = () => {
     useContext(ExerciseContext);
 
   useEffect(() => {
-    fetch("http://localhost:5000/exercises")
+    fetch(`${process.env.REACT_APP_API_URL}/exercises`)
       .then((response) => response.json())
       .then((data) => {
         setExerciseIDs(data.ids);

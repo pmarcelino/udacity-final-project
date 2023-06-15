@@ -13,7 +13,7 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
     const fetchExercise = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/exercises/${exerciseID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`
         );
         const data = await response.json();
 
@@ -41,7 +41,7 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
         };
 
         const response = await fetch(
-          `http://localhost:5000/exercises/${exerciseID}`,
+          `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`,
           {
             method: "PUT",
             headers: {

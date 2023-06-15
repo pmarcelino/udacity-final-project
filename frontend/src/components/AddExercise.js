@@ -20,14 +20,17 @@ export const AddExercise = ({ closePopup, addExercise }) => {
           answer: answer,
         };
 
-        const response = await fetch("http://localhost:5000/exercises", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/exercises`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Error adding exercise");

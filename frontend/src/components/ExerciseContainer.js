@@ -45,13 +45,15 @@ const ExerciseContainer = () => {
   useEffect(() => {
     const fetchRandomExercise = async () => {
       try {
-        const response = await fetch("http://localhost:5000/exercises");
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/exercises`
+        );
         const data = await response.json();
         const randomIndex = Math.floor(Math.random() * data.ids.length);
         const randomID = data.ids[randomIndex];
 
         const exerciseResponse = await fetch(
-          `http://localhost:5000/exercises/${randomID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${randomID}`
         );
         const exerciseData = await exerciseResponse.json();
 
@@ -70,7 +72,7 @@ const ExerciseContainer = () => {
   const fetchSpecificExercise = useCallback(async (selectedExerciseID) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/exercises/${selectedExerciseID}`
+        `${process.env.REACT_APP_API_URL}/exercises/${selectedExerciseID}`
       );
       const exerciseData = await response.json();
 
@@ -92,7 +94,9 @@ const ExerciseContainer = () => {
   const nextExercise = useCallback(
     async (nextIndex = null) => {
       try {
-        const response = await fetch("http://localhost:5000/exercises");
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/exercises`
+        );
         const data = await response.json();
 
         // If nextIndex wasn't passed, calculate it
@@ -109,7 +113,7 @@ const ExerciseContainer = () => {
         const nextID = data.ids[index];
 
         const exerciseResponse = await fetch(
-          `http://localhost:5000/exercises/${nextID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${nextID}`
         );
         const exerciseData = await exerciseResponse.json();
 
@@ -149,13 +153,13 @@ const ExerciseContainer = () => {
 
       // Save the nextIndex before deleting the current exercise
       const responseBeforeDelete = await fetch(
-        "http://localhost:5000/exercises"
+        `${process.env.REACT_APP_API_URL}/exercises`
       );
       const dataBeforeDelete = await responseBeforeDelete.json();
       const nextIndexBeforeDelete = dataBeforeDelete.ids.indexOf(exerciseID);
 
       const response = await fetch(
-        `http://localhost:5000/exercises/${exerciseID}`,
+        `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`,
         {
           method: "DELETE",
           headers: {
