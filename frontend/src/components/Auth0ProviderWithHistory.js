@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const Auth0ProviderWithHistory = ({ children }) => {
+  const dotenv = require("dotenv");
+
+  // Load .env file if exists, otherwise load .env.docker
+  const result = dotenv.config({ path: ".env" });
+  if (result.error) {
+    dotenv.config({ path: ".env.docker" });
+  }
   const domain = process.env.REACT_APP_AUTH0_DOMAIN;
   const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
   const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
