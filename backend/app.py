@@ -1,11 +1,19 @@
 import os
 import random
+import logging
 
 from auth import AuthError, requires_auth
 from flask import Flask, request, abort, jsonify, render_template
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import setup_db, Exercise, db
+
+# Configure logging
+logging.basicConfig(
+    filename="app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 
 def create_app(test_config=None):
@@ -48,6 +56,8 @@ def create_app(test_config=None):
 
     @app.route("/exercises")
     def get_exercises():
+        logging.info("Processing GET request /exercises")
+
         """Gets all exercises from the database and returns them as JSON"""
         exercises = Exercise.query.all()
 
@@ -67,6 +77,8 @@ def create_app(test_config=None):
 
     @app.route("/exercises/<int:exercise_id>")
     def get_exercise(exercise_id):
+        logging.info(f"Processing GET request /exercises/{exercise_id}")
+
         """Gets a specific exercise from the database and returns it as JSON"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
@@ -83,6 +95,8 @@ def create_app(test_config=None):
     @app.route("/exercises/<int:exercise_id>", methods=["PUT"])
     @requires_auth("put:exercise")
     def update_exercise(payload, exercise_id):
+        logging.info(f"Processing PUT request /exercises/{exercise_id}")
+
         """Updates an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
@@ -118,6 +132,8 @@ def create_app(test_config=None):
     @app.route("/exercises/<int:exercise_id>", methods=["DELETE"])
     @requires_auth("delete:exercise")
     def delete_exercise(payload, exercise_id):
+        logging.info(f"Processing DELETE request /exercises/{exercise_id}")
+
         """Deletes an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
@@ -137,6 +153,8 @@ def create_app(test_config=None):
     @app.route("/exercises", methods=["POST"])
     @requires_auth("post:exercise")
     def post_exercise(payload):
+        logging.info("Processing POST request /exercises")
+
         """Adds a new exercise to the database"""
         body = request.get_json()
         question = body.get("question", None)
@@ -166,6 +184,8 @@ def create_app(test_config=None):
 
     @app.errorhandler(404)
     def unprocessable(error):
+        logging.error("Error 404: resource not found")
+
         return (
             jsonify({"success": False, "error": 404, "message": "resource not found"}),
             404,
@@ -173,6 +193,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(422)
     def unprocessable(error):
+        logging.error("Error 422: unprocessable")
         return (
             jsonify({"success": False, "error": 422, "message": "unprocessable"}),
             422,
@@ -180,6 +201,8 @@ def create_app(test_config=None):
 
     @app.errorhandler(500)
     def unprocessable(error):
+        logging.error("Error 500: internal server error")
+
         return (
             jsonify(
                 {"success": False, "error": 500, "message": "internal server error"}
@@ -189,6 +212,8 @@ def create_app(test_config=None):
 
     @app.errorhandler(AuthError)
     def unprocessable(ex):
+        logging.error(f'AuthError {ex.error["code"]}: {ex.error["description"]}')
+
         return (
             jsonify(
                 {
