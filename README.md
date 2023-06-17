@@ -6,7 +6,7 @@ The Math App is a web application that provides math exercises to users, allowin
 
 - Display math exercises for users to solve.
 - Check answers and provide immediate feedback.
-- Flashcard functionality to help users practice.
+- Flashcard feature to help users practice.
 - Admin panel for managing questions (add, edit, delete).
 
 ## Technologies
