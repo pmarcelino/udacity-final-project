@@ -69,8 +69,6 @@ phases:
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - kubectl apply -f postgres-pvc.yaml
-      - kubectl apply -f postgres-kubernetes.yml
       - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI_BACKEND:$TAG"'@' backend-kubernetes.yml
       - sed -i 's|VAR_SQLALCHEMY_DATABASE_URI|'"$SQLALCHEMY_DATABASE_URI"'|' backend-kubernetes.yml
       - sed -i 's|VAR_AUTH0_USERNAME|'"$AUTH0_USERNAME"'|' backend-kubernetes.yml
