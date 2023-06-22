@@ -5,6 +5,10 @@ const ExerciseContext = createContext({
   setSelectedExerciseID: () => {},
   exerciseIDs: [],
   setExerciseIDs: () => {},
+  permissions: [],
+  setPermissions: () => {},
+  token: null,
+  setToken: () => {},
 });
 
 export default ExerciseContext;

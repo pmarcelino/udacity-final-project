@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import ExerciseContext from "./ExerciseContext";
 import { useAuth0 } from "@auth0/auth0-react";
-import jwtDecode from "jwt-decode";
 import { AddExercise } from "./AddExercise";
 import { EditExercise } from "./EditExercise";
 
 const ExerciseContainer = () => {
-  const [permissions, setPermissions] = useState([]);
   const [exerciseID, setExerciseID] = useState("");
   const [exerciseQuestion, setExerciseQuestion] = useState("");
   const [exerciseAnswer, setExerciseAnswer] = useState("");
@@ -17,28 +15,14 @@ const ExerciseContainer = () => {
     setSelectedExerciseID,
     exerciseIDs,
     setExerciseIDs,
+    token,
+    permissions,
   } = useContext(ExerciseContext);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  // Fetch the Access Token and decode the permissions
-  useEffect(() => {
-    const fetchAccessToken = async () => {
-      try {
-        const token = await getAccessTokenSilently();
-        const decodedToken = jwtDecode(token);
-        const tokenPermissions = decodedToken["permissions"] || [];
-        setPermissions(tokenPermissions);
-      } catch (error) {
-        console.error("Error fetching Access Token:", error);
-      }
-    };
-
-    fetchAccessToken();
-  }, [getAccessTokenSilently]);
-
   const canAddExercise = permissions.includes("post:exercise");
-  const canEditExercise = permissions.includes("put:exercise");
+  const canEditExercise = permissions.includes("patch:exercise");
   const canDeleteExercise = permissions.includes("delete:exercise");
 
   // Get random exercise ID from the backend
@@ -46,14 +30,26 @@ const ExerciseContainer = () => {
     const fetchRandomExercise = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises`
+          `${process.env.REACT_APP_API_URL}/exercises`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await response.json();
         const randomIndex = Math.floor(Math.random() * data.ids.length);
         const randomID = data.ids[randomIndex];
 
         const exerciseResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${randomID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${randomID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const exerciseData = await exerciseResponse.json();
 
@@ -66,23 +62,32 @@ const ExerciseContainer = () => {
     };
 
     fetchRandomExercise();
-  }, []);
+  }, [token]);
 
   // Get specific exercise ID from the backend
-  const fetchSpecificExercise = useCallback(async (selectedExerciseID) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/exercises/${selectedExerciseID}`
-      );
-      const exerciseData = await response.json();
+  const fetchSpecificExercise = useCallback(
+    async (selectedExerciseID) => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/exercises/${selectedExerciseID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const exerciseData = await response.json();
 
-      setExerciseID(exerciseData.id);
-      setExerciseQuestion(exerciseData.question);
-      setExerciseAnswer(exerciseData.answer);
-    } catch (error) {
-      console.error("Error fetching specific exercise:", error);
-    }
-  }, []);
+        setExerciseID(exerciseData.id);
+        setExerciseQuestion(exerciseData.question);
+        setExerciseAnswer(exerciseData.answer);
+      } catch (error) {
+        console.error("Error fetching specific exercise:", error);
+      }
+    },
+    [token]
+  );
 
   useEffect(() => {
     if (selectedExerciseID) {
@@ -95,7 +100,13 @@ const ExerciseContainer = () => {
     async (nextIndex = null) => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises`
+          `${process.env.REACT_APP_API_URL}/exercises`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await response.json();
 
@@ -113,7 +124,13 @@ const ExerciseContainer = () => {
         const nextID = data.ids[index];
 
         const exerciseResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${nextID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${nextID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const exerciseData = await exerciseResponse.json();
 
@@ -131,6 +148,7 @@ const ExerciseContainer = () => {
       setExerciseQuestion,
       setExerciseAnswer,
       setSelectedExerciseID,
+      token,
     ]
   );
 
@@ -153,7 +171,13 @@ const ExerciseContainer = () => {
 
       // Save the nextIndex before deleting the current exercise
       const responseBeforeDelete = await fetch(
-        `${process.env.REACT_APP_API_URL}/exercises`
+        `${process.env.REACT_APP_API_URL}/exercises`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const dataBeforeDelete = await responseBeforeDelete.json();
       const nextIndexBeforeDelete = dataBeforeDelete.ids.indexOf(exerciseID);
@@ -239,6 +263,7 @@ const ExerciseContainer = () => {
                 closePopup={() => setEditOpen(false)}
                 editExercise={editExercise}
                 exerciseID={exerciseID}
+                token={token}
               />
             ) : null}
             {canDeleteExercise && (

@@ -50,12 +50,13 @@ def create_app(test_config=None):
             "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
         )
         response.headers.add(
-            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
+            "Access-Control-Allow-Methods", "GET,PUT,PATCH,POST,DELETE,OPTIONS"
         )
         return response
 
     @app.route("/exercises")
-    def get_exercises():
+    @requires_auth("get:exercises")
+    def get_exercises(payload):
         logging.info("Processing GET request /exercises")
 
         """Gets all exercises from the database and returns them as JSON"""
@@ -76,7 +77,8 @@ def create_app(test_config=None):
         )
 
     @app.route("/exercises/<int:exercise_id>")
-    def get_exercise(exercise_id):
+    @requires_auth("get:exercise")
+    def get_exercise(payload, exercise_id):
         logging.info(f"Processing GET request /exercises/{exercise_id}")
 
         """Gets a specific exercise from the database and returns it as JSON"""
@@ -92,10 +94,10 @@ def create_app(test_config=None):
             {"success": True, "id": exercise_id, "question": question, "answer": answer}
         )
 
-    @app.route("/exercises/<int:exercise_id>", methods=["PUT"])
-    @requires_auth("put:exercise")
+    @app.route("/exercises/<int:exercise_id>", methods=["PATCH"])
+    @requires_auth("patch:exercise")
     def update_exercise(payload, exercise_id):
-        logging.info(f"Processing PUT request /exercises/{exercise_id}")
+        logging.info(f"Processing PATCH request /exercises/{exercise_id}")
 
         """Updates an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()

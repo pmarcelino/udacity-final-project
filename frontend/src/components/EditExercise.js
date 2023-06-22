@@ -2,7 +2,12 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 // EditExercise component definition
-export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
+export const EditExercise = ({
+  closePopup,
+  editExercise,
+  exerciseID,
+  token,
+}) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -13,7 +18,13 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
     const fetchExercise = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`
+          `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await response.json();
 
@@ -25,7 +36,7 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
     };
 
     fetchExercise();
-  }, [exerciseID]);
+  }, [exerciseID, token]);
 
   // Handle submit function
   const handleSubmit = useCallback(
@@ -43,7 +54,7 @@ export const EditExercise = ({ closePopup, editExercise, exerciseID }) => {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`,
           {
-            method: "PUT",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
