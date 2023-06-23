@@ -6,6 +6,7 @@ export const EditExercise = ({
   closePopup,
   editExercise,
   exerciseID,
+  reviewerID,
   token,
 }) => {
   const [question, setQuestion] = useState("");
@@ -49,6 +50,7 @@ export const EditExercise = ({
         const payload = {
           question: question,
           answer: answer,
+          reviewer: reviewerID,
         };
 
         const response = await fetch(
@@ -77,7 +79,14 @@ export const EditExercise = ({
         console.error("Error editing exercise:", error);
       }
     },
-    [getAccessTokenSilently, question, answer, exerciseID, editExercise]
+    [
+      getAccessTokenSilently,
+      question,
+      answer,
+      exerciseID,
+      reviewerID,
+      editExercise,
+    ]
   );
 
   const handleClose = useCallback(() => {

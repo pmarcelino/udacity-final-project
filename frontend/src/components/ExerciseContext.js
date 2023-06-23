@@ -9,6 +9,8 @@ const ExerciseContext = createContext({
   setPermissions: () => {},
   token: null,
   setToken: () => {},
+  reviewerID: null,
+  setReviewerID: () => {},
 });
 
 export default ExerciseContext;

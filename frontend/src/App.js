@@ -12,6 +12,7 @@ import jwtDecode from "jwt-decode";
 function App() {
   const [selectedExerciseID, setSelectedExerciseID] = useState(null);
   const [exerciseIDs, setExerciseIDs] = useState([]);
+  const [reviewerID, setReviewerID] = useState(null);
   const [permissions, setPermissions] = useState([]);
   const [token, setToken] = useState(null);
   const {
@@ -26,9 +27,11 @@ function App() {
     try {
       const token = await getAccessTokenSilently();
       const decodedToken = jwtDecode(token);
+      const reviewerID = decodedToken.sub;
       const tokenPermissions = decodedToken["permissions"] || [];
       setToken(token);
       setPermissions(tokenPermissions);
+      setReviewerID(reviewerID);
     } catch (error) {
       console.error("Error fetching Access Token:", error);
     }
@@ -54,6 +57,7 @@ function App() {
           setExerciseIDs,
           token,
           permissions,
+          reviewerID,
         }}
       >
         <div className="App">

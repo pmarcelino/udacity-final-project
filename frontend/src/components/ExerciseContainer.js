@@ -15,6 +15,7 @@ const ExerciseContainer = () => {
     setSelectedExerciseID,
     exerciseIDs,
     setExerciseIDs,
+    reviewerID,
     token,
     permissions,
   } = useContext(ExerciseContext);
@@ -263,6 +264,7 @@ const ExerciseContainer = () => {
                 closePopup={() => setEditOpen(false)}
                 editExercise={editExercise}
                 exerciseID={exerciseID}
+                reviewerID={reviewerID}
                 token={token}
               />
             ) : null}

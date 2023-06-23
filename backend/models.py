@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 
 db = SQLAlchemy()
 
@@ -17,6 +17,7 @@ class Exercise(db.Model):
     id = Column(Integer, primary_key=True)
     question = Column(String)
     answer = Column(String)
+    reviews = db.relationship("Review", back_populates="exercise")
 
     def __init__(self, question, answer):
         self.question = question
@@ -37,16 +38,35 @@ class Exercise(db.Model):
         return {"id": self.id, "question": self.question, "answer": self.answer}
 
 
-class User(db.Model):
-    __tablename__ = "users"
+class Review(db.Model):
+    __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True)
-    auth0_id = Column(String, unique=True)
-    type = Column(String)
+    date = Column(DateTime)
+    exercise_id = Column(Integer, ForeignKey("exercises.id"))
+    reviewer_id = Column(String)
+    exercise = db.relationship("Exercise", back_populates="reviews")
 
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, date, exercise_id, reviewer_id):
+        self.date = date
+        self.exercise_id = exercise_id
+        self.reviewer_id = reviewer_id
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
     def format(self):
-        return {"id": self.id, "email": self.email, "auth0_id": self.auth0_id}
+        return {
+            "id": self.id,
+            "date": self.date,
+            "exercise_id": self.exercise_id,
+            "reviewer_id": self.reviewer_id,
+        }

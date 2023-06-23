@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 import logging
@@ -6,7 +7,7 @@ from auth import AuthError, requires_auth
 from flask import Flask, request, abort, jsonify, render_template
 from flask_cors import CORS
 from flask_migrate import Migrate
-from models import setup_db, Exercise, db
+from models import setup_db, Exercise, Review, db
 
 # Configure logging
 logging.basicConfig(
@@ -108,6 +109,8 @@ def create_app(test_config=None):
         body = request.get_json()
         question = body.get("question", None)
         answer = body.get("answer", None)
+        reviewer_id = body.get("reviewer", None)
+        date = datetime.datetime.now()
 
         if "" in (question, answer):
             abort(422)
@@ -115,7 +118,11 @@ def create_app(test_config=None):
         try:
             exercise.question = question
             exercise.answer = answer
+            exercise.exercise_id = exercise_id
             exercise.update()
+
+            review = Review(date, exercise_id, reviewer_id)
+            review.insert()
         except BaseException:
             db.session.rollback()
             abort(500)
