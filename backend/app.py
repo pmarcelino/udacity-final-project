@@ -32,10 +32,12 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
     else:
         config = {
-            "SQLALCHEMY_DATABASE_URI": os.environ.get("SQLALCHEMY_DATABASE_URI", None),
+            "SQLALCHEMY_DATABASE_URI": os.environ.get(
+                "SQLALCHEMY_DATABASE_URI",
+                None),
             "SQLALCHEMY_TRACK_MODIFICATIONS": os.environ.get(
-                "SQLALCHEMY_TRACK_MODIFICATIONS", None
-            ),
+                "SQLALCHEMY_TRACK_MODIFICATIONS",
+                None),
         }
         app.config.from_mapping(config)
 
@@ -90,9 +92,8 @@ def create_app(test_config=None):
         question = exercise.question
         answer = exercise.answer
 
-        return jsonify(
-            {"success": True, "id": exercise_id, "question": question, "answer": answer}
-        )
+        return jsonify({"success": True, "id": exercise_id,
+                        "question": question, "answer": answer})
 
     @app.route("/exercises/<int:exercise_id>", methods=["PATCH"])
     @requires_auth("patch:exercise")
@@ -193,10 +194,8 @@ def create_app(test_config=None):
     @app.errorhandler(404)
     def unprocessable(error):
         logging.error("Error 404: resource not found")
-        return (
-            jsonify({"success": False, "error": 404, "message": "resource not found"}),
-            404,
-        )
+        return (jsonify({"success": False, "error": 404,
+                         "message": "resource not found"}), 404, )
 
     @app.errorhandler(422)
     def unprocessable(error):
@@ -209,7 +208,6 @@ def create_app(test_config=None):
     @app.errorhandler(500)
     def unprocessable(error):
         logging.error("Error 500: internal server error")
-
         return (
             jsonify(
                 {"success": False, "error": 500, "message": "internal server error"}
@@ -219,7 +217,8 @@ def create_app(test_config=None):
 
     @app.errorhandler(AuthError)
     def unprocessable(ex):
-        logging.error(f'AuthError {ex.error["code"]}: {ex.error["description"]}')
+        logging.error(
+            f'AuthError {ex.error["code"]}: {ex.error["description"]}')
 
         return (
             jsonify(

@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 AUTH0_CLIENT_ID_TEST_ADMIN = os.environ.get("AUTH0_CLIENT_ID_TEST_ADMIN", None)
-AUTH0_CLIENT_SECRET_TEST_ADMIN = os.environ.get("AUTH0_CLIENT_SECRET_TEST_ADMIN", None)
+AUTH0_CLIENT_SECRET_TEST_ADMIN = os.environ.get(
+    "AUTH0_CLIENT_SECRET_TEST_ADMIN", None)
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", None)
 API_AUDIENCE = os.environ.get("API_AUDIENCE", None)
 
@@ -129,7 +130,9 @@ class AppTestCase(unittest.TestCase):
         status_code = 200
 
         # When
-        res = self.client().delete(f"/exercises/{exercise_id}", headers=headers)
+        res = self.client().delete(
+            f"/exercises/{exercise_id}",
+            headers=headers)
         data = json.loads(res.data)
 
         # Then
@@ -146,7 +149,9 @@ class AppTestCase(unittest.TestCase):
         message = self.message_404
 
         # When
-        res = self.client().delete(f"/exercises/{exercise_id}", headers=headers)
+        res = self.client().delete(
+            f"/exercises/{exercise_id}",
+            headers=headers)
         data = json.loads(res.data)
 
         # Then
