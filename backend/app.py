@@ -1,6 +1,5 @@
 import datetime
 import os
-import random
 import logging
 
 from auth import AuthError, requires_auth
@@ -58,9 +57,9 @@ def create_app(test_config=None):
     @app.route("/exercises")
     @requires_auth("get:exercises")
     def get_exercises(payload):
+        """Gets all exercises from the database and returns them as JSON"""
         logging.info("Processing GET request /exercises")
 
-        """Gets all exercises from the database and returns them as JSON"""
         exercises = Exercise.query.all()
 
         ids = [exercise.id for exercise in exercises]
@@ -80,9 +79,9 @@ def create_app(test_config=None):
     @app.route("/exercises/<int:exercise_id>")
     @requires_auth("get:exercise")
     def get_exercise(payload, exercise_id):
+        """Gets a specific exercise from the database and returns it as JSON"""
         logging.info(f"Processing GET request /exercises/{exercise_id}")
 
-        """Gets a specific exercise from the database and returns it as JSON"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
         if exercise is None:
@@ -98,9 +97,9 @@ def create_app(test_config=None):
     @app.route("/exercises/<int:exercise_id>", methods=["PATCH"])
     @requires_auth("patch:exercise")
     def update_exercise(payload, exercise_id):
+        """Updates an exercise identified by its ID"""
         logging.info(f"Processing PATCH request /exercises/{exercise_id}")
 
-        """Updates an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
         if exercise is None:
@@ -141,9 +140,9 @@ def create_app(test_config=None):
     @app.route("/exercises/<int:exercise_id>", methods=["DELETE"])
     @requires_auth("delete:exercise")
     def delete_exercise(payload, exercise_id):
+        """Deletes an exercise identified by its ID"""
         logging.info(f"Processing DELETE request /exercises/{exercise_id}")
 
-        """Deletes an exercise identified by its ID"""
         exercise = Exercise.query.filter_by(id=exercise_id).one_or_none()
 
         if exercise is None:
@@ -162,9 +161,9 @@ def create_app(test_config=None):
     @app.route("/exercises", methods=["POST"])
     @requires_auth("post:exercise")
     def post_exercise(payload):
+        """Adds a new exercise to the database"""
         logging.info("Processing POST request /exercises")
 
-        """Adds a new exercise to the database"""
         body = request.get_json()
         question = body.get("question", None)
         answer = body.get("answer", None)
@@ -194,7 +193,6 @@ def create_app(test_config=None):
     @app.errorhandler(404)
     def unprocessable(error):
         logging.error("Error 404: resource not found")
-
         return (
             jsonify({"success": False, "error": 404, "message": "resource not found"}),
             404,

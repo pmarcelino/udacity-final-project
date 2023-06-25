@@ -2,7 +2,6 @@ import http.client
 import json
 import os
 import unittest
-
 from app import create_app
 from dotenv import load_dotenv
 

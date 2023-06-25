@@ -2,7 +2,6 @@ import http.client
 import json
 import os
 import unittest
-
 from app import create_app
 from dotenv import load_dotenv
 
@@ -176,7 +175,7 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data["question"], question)
         self.assertEqual(data["answer"], answer)
 
-    def test_422_create_exercise_fails_missing_exercise(self):
+    def test_422_create_exercise_fails_missing_question(self):
         """Test create exercise fails when the question is missing"""
         # Given
         headers = {"Authorization": "Bearer " + self.token}

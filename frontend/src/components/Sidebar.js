@@ -5,6 +5,7 @@ const Sidebar = () => {
   const { exerciseIDs, setExerciseIDs, setSelectedExerciseID, token } =
     useContext(ExerciseContext);
 
+  // Get all exercise IDs from the backend
   useEffect(() => {
     const fetchExerciseIDs = async () => {
       try {
@@ -27,6 +28,7 @@ const Sidebar = () => {
     fetchExerciseIDs();
   }, [setExerciseIDs, token]);
 
+  // Render component
   return (
     <nav className="nav flex-column">
       {exerciseIDs.map((id) => (

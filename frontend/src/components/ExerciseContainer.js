@@ -67,7 +67,7 @@ const ExerciseContainer = () => {
   // Go to the next exercise
   const nextExercise = useCallback(async () => {
     if (exerciseIDs.length === 0) {
-      // No exercise IDs available, handle the case accordingly
+      // No exercise IDs available
       return;
     }
 

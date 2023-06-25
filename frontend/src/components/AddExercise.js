@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-// AddExercise component definition
 export const AddExercise = ({ closePopup, addExercise }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
 
+  // Handle form submission
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -49,6 +49,7 @@ export const AddExercise = ({ closePopup, addExercise }) => {
     [getAccessTokenSilently, question, answer, addExercise]
   );
 
+  // Handle close button
   const handleClose = useCallback(() => {
     setShowSuccessMessage(false);
     closePopup();

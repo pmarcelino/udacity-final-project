@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 
-// EditExercise component definition
 export const EditExercise = ({
   closePopup,
   editExercise,
@@ -55,6 +54,7 @@ export const EditExercise = ({
     [question, answer, token, exerciseID, reviewerID, editExercise]
   );
 
+  // Handle close function
   const handleClose = useCallback(() => {
     setShowSuccessMessage(false);
     closePopup();
