@@ -1,5 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import React, { useState, useCallback } from "react";
 
 // EditExercise component definition
 export const EditExercise = ({
@@ -8,36 +7,12 @@ export const EditExercise = ({
   exerciseID,
   reviewerID,
   token,
+  exerciseAnswer,
+  exerciseQuestion,
 }) => {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [question, setQuestion] = useState(exerciseQuestion);
+  const [answer, setAnswer] = useState(exerciseAnswer);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const { getAccessTokenSilently } = useAuth0();
-
-  // Get answer and question from the backend
-  useEffect(() => {
-    const fetchExercise = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${exerciseID}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-
-        setQuestion(data.question);
-        setAnswer(data.answer);
-      } catch (error) {
-        console.error("Error fetching exercise:", error);
-      }
-    };
-
-    fetchExercise();
-  }, [exerciseID, token]);
 
   // Handle submit function
   const handleSubmit = useCallback(
@@ -45,8 +20,6 @@ export const EditExercise = ({
       e.preventDefault();
 
       try {
-        const token = await getAccessTokenSilently();
-
         const payload = {
           question: question,
           answer: answer,
@@ -79,14 +52,7 @@ export const EditExercise = ({
         console.error("Error editing exercise:", error);
       }
     },
-    [
-      getAccessTokenSilently,
-      question,
-      answer,
-      exerciseID,
-      reviewerID,
-      editExercise,
-    ]
+    [question, answer, token, exerciseID, reviewerID, editExercise]
   );
 
   const handleClose = useCallback(() => {

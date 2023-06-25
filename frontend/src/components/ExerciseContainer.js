@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import ExerciseContext from "./ExerciseContext";
-import { useAuth0 } from "@auth0/auth0-react";
 import { AddExercise } from "./AddExercise";
 import { EditExercise } from "./EditExercise";
 
@@ -9,7 +8,6 @@ const ExerciseContainer = () => {
   const [exerciseQuestion, setExerciseQuestion] = useState("");
   const [exerciseAnswer, setExerciseAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
-  const { getAccessTokenSilently } = useAuth0();
   const {
     selectedExerciseID,
     setSelectedExerciseID,
@@ -26,46 +24,16 @@ const ExerciseContainer = () => {
   const canEditExercise = permissions.includes("patch:exercise");
   const canDeleteExercise = permissions.includes("delete:exercise");
 
-  // Get random exercise ID from the backend
+  // Choose a random exercise ID from the exercise IDs available in the context
   useEffect(() => {
-    const fetchRandomExercise = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        const randomIndex = Math.floor(Math.random() * data.ids.length);
-        const randomID = data.ids[randomIndex];
+    if (exerciseIDs.length > 0) {
+      const randomIndex = Math.floor(Math.random() * exerciseIDs.length);
+      const randomID = exerciseIDs[randomIndex];
+      setSelectedExerciseID(randomID);
+    }
+  }, [exerciseIDs, setSelectedExerciseID]);
 
-        const exerciseResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${randomID}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const exerciseData = await exerciseResponse.json();
-
-        setExerciseID(exerciseData.id);
-        setExerciseQuestion(exerciseData.question);
-        setExerciseAnswer(exerciseData.answer);
-      } catch (error) {
-        console.error("Error fetching random exercise:", error);
-      }
-    };
-
-    fetchRandomExercise();
-  }, [token]);
-
-  // Get specific exercise ID from the backend
+  // Get specific exercise from the backend
   const fetchSpecificExercise = useCallback(
     async (selectedExerciseID) => {
       try {
@@ -97,61 +65,44 @@ const ExerciseContainer = () => {
   }, [selectedExerciseID, fetchSpecificExercise]);
 
   // Go to the next exercise
-  const nextExercise = useCallback(
-    async (nextIndex = null) => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
+  const nextExercise = useCallback(async () => {
+    if (exerciseIDs.length === 0) {
+      // No exercise IDs available, handle the case accordingly
+      return;
+    }
 
-        // If nextIndex wasn't passed, calculate it
-        if (nextIndex === null) {
-          console.log("here");
-          nextIndex = data.ids.indexOf(exerciseID) + 1;
+    const currentIndex = exerciseIDs.indexOf(exerciseID);
+    const nextIndex = (currentIndex + 1) % exerciseIDs.length;
+    const nextID = exerciseIDs[nextIndex];
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/exercises/${nextID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+      const exerciseData = await response.json();
 
-        console.log(nextIndex);
-
-        const maxIndex = data.ids.length - 1;
-        const minIndex = 0;
-        const index = nextIndex > maxIndex ? minIndex : nextIndex;
-        const nextID = data.ids[index];
-
-        const exerciseResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/exercises/${nextID}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const exerciseData = await exerciseResponse.json();
-
-        setExerciseID(exerciseData.id);
-        setExerciseQuestion(exerciseData.question);
-        setExerciseAnswer(exerciseData.answer);
-        setSelectedExerciseID(exerciseData.id);
-      } catch (error) {
-        console.error("Error fetching next exercise:", error);
-      }
-    },
-    [
-      exerciseID,
-      setExerciseID,
-      setExerciseQuestion,
-      setExerciseAnswer,
-      setSelectedExerciseID,
-      token,
-    ]
-  );
+      setExerciseID(exerciseData.id);
+      setExerciseQuestion(exerciseData.question);
+      setExerciseAnswer(exerciseData.answer);
+      setSelectedExerciseID(exerciseData.id);
+    } catch (error) {
+      console.error("Error fetching next exercise:", error);
+    }
+  }, [
+    exerciseIDs,
+    exerciseID,
+    setExerciseID,
+    setExerciseQuestion,
+    setExerciseAnswer,
+    setSelectedExerciseID,
+    token,
+  ]);
 
   // Add exercise
   const addExercise = (newExercise) => {
@@ -168,8 +119,6 @@ const ExerciseContainer = () => {
   // Delete exercise
   const deleteExercise = useCallback(async () => {
     try {
-      const token = await getAccessTokenSilently();
-
       // Save the nextIndex before deleting the current exercise
       const responseBeforeDelete = await fetch(
         `${process.env.REACT_APP_API_URL}/exercises`,
@@ -202,13 +151,7 @@ const ExerciseContainer = () => {
     } catch (error) {
       console.error("Error deleting exercise:", error);
     }
-  }, [
-    getAccessTokenSilently,
-    exerciseID,
-    setExerciseIDs,
-    exerciseIDs,
-    nextExercise,
-  ]);
+  }, [token, exerciseID, setExerciseIDs, exerciseIDs, nextExercise]);
 
   // Toggle answer
   const toggleAnswer = () => {
@@ -266,6 +209,8 @@ const ExerciseContainer = () => {
                 exerciseID={exerciseID}
                 reviewerID={reviewerID}
                 token={token}
+                exerciseAnswer={exerciseAnswer}
+                exerciseQuestion={exerciseQuestion}
               />
             ) : null}
             {canDeleteExercise && (

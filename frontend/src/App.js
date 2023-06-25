@@ -15,6 +15,7 @@ function App() {
   const [reviewerID, setReviewerID] = useState(null);
   const [permissions, setPermissions] = useState([]);
   const [token, setToken] = useState(null);
+  const [isLoadingToken, setIsLoadingToken] = useState(true);
   const {
     isAuthenticated,
     isLoading,
@@ -32,6 +33,7 @@ function App() {
       setToken(token);
       setPermissions(tokenPermissions);
       setReviewerID(reviewerID);
+      setIsLoadingToken(false);
     } catch (error) {
       console.error("Error fetching Access Token:", error);
     }
@@ -47,7 +49,12 @@ function App() {
     return <Loading />;
   }
 
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
+    loginWithRedirect();
+    return null;
+  }
+
+  if (isAuthenticated && !isLoadingToken) {
     return (
       <ExerciseContext.Provider
         value={{
@@ -75,9 +82,6 @@ function App() {
         </div>
       </ExerciseContext.Provider>
     );
-  } else {
-    loginWithRedirect();
-    return null;
   }
 }
 
