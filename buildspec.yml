@@ -41,8 +41,10 @@ phases:
       - echo AUTH0_PASSWORD=$(aws ssm get-parameter --name AUTH0_PASSWORD --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo AUTH0_CLIENT_ID=$(aws ssm get-parameter --name AUTH0_CLIENT_ID --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo AUTH0_CLIENT_SECRET=$(aws ssm get-parameter --name AUTH0_CLIENT_SECRET --query 'Parameter.Value' --output text) >> backend/.env.docker
-      - echo AUTH0_CLIENT_ID_TEST=$(aws ssm get-parameter --name AUTH0_CLIENT_ID_TEST --query 'Parameter.Value' --output text) >> backend/.env.docker
-      - echo AUTH0_CLIENT_SECRET_TEST=$(aws ssm get-parameter --name AUTH0_CLIENT_SECRET_TEST --query 'Parameter.Value' --output text) >> backend/.env.docker
+      - echo AUTH0_CLIENT_ID_TEST_ADMIN=$(aws ssm get-parameter --name AUTH0_CLIENT_ID_TEST_ADMIN --query 'Parameter.Value' --output text) >> backend/.env.docker
+      - echo AUTH0_CLIENT_SECRET_TEST_ADMIN=$(aws ssm get-parameter --name AUTH0_CLIENT_SECRET_TEST_ADMIN --query 'Parameter.Value' --output text) >> backend/.env.docker
+      - echo AUTH0_CLIENT_ID_TEST_USER=$(aws ssm get-parameter --name AUTH0_CLIENT_ID_TEST_USER --query 'Parameter.Value' --output text) >> backend/.env.docker
+      - echo AUTH0_CLIENT_SECRET_TEST_USER=$(aws ssm get-parameter --name AUTH0_CLIENT_SECRET_TEST_USER --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo AUTH0_DOMAIN=$(aws ssm get-parameter --name AUTH0_DOMAIN --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo ALGORITHMS=$(aws ssm get-parameter --name ALGORITHMS --query 'Parameter.Value' --output text) >> backend/.env.docker
       - echo API_AUDIENCE=$(aws ssm get-parameter --name API_AUDIENCE --query 'Parameter.Value' --output text) >> backend/.env.docker
@@ -75,8 +77,10 @@ phases:
       - sed -i 's|VAR_AUTH0_PASSWORD|'"$AUTH0_PASSWORD"'|' backend-kubernetes.yml
       - sed -i 's@VAR_AUTH0_CLIENT_ID@'"$AUTH0_CLIENT_ID"'@' backend-kubernetes.yml
       - sed -i 's@VAR_AUTH0_CLIENT_SECRET@'"$AUTH0_CLIENT_SECRET"'@' backend-kubernetes.yml
-      - sed -i 's@VAR_AUTH0_CLIENT_ID_TEST@'"$AUTH0_CLIENT_ID_TEST"'@' backend-kubernetes.yml
-      - sed -i 's@VAR_AUTH0_CLIENT_SECRET_TEST@'"$AUTH0_CLIENT_SECRET_TEST"'@' backend-kubernetes.yml
+      - sed -i 's@VAR_AUTH0_CLIENT_ID_TEST_ADMIN@'"$AUTH0_CLIENT_ID_TEST_ADMIN"'@' backend-kubernetes.yml
+      - sed -i 's@VAR_AUTH0_CLIENT_SECRET_TEST_ADMIN@'"$AUTH0_CLIENT_SECRET_TEST_ADMIN"'@' backend-kubernetes.yml
+      - sed -i 's@VAR_AUTH0_CLIENT_ID_TEST_USER@'"$AUTH0_CLIENT_ID_TEST_USER"'@' backend-kubernetes.yml
+      - sed -i 's@VAR_AUTH0_CLIENT_SECRET_TEST_USER@'"$AUTH0_CLIENT_SECRET_TEST_USER"'@' backend-kubernetes.yml
       - sed -i 's@VAR_AUTH0_DOMAIN@'"$AUTH0_DOMAIN"'@' backend-kubernetes.yml
       - sed -i 's@VAR_ALGORITHMS@'"$ALGORITHMS"'@' backend-kubernetes.yml
       - sed -i 's@VAR_API_AUDIENCE@'"$API_AUDIENCE"'@' backend-kubernetes.yml
@@ -104,8 +108,10 @@ env:
     AUTH0_PASSWORD: AUTH0_PASSWORD
     AUTH0_CLIENT_ID: AUTH0_CLIENT_ID
     AUTH0_CLIENT_SECRET: AUTH0_CLIENT_SECRET
-    AUTH0_CLIENT_ID_TEST: AUTH0_CLIENT_ID_TEST
-    AUTH0_CLIENT_SECRET_TEST: AUTH0_CLIENT_SECRET_TEST
+    AUTH0_CLIENT_ID_TEST_ADMIN: AUTH0_CLIENT_ID_TEST_ADMIN
+    AUTH0_CLIENT_SECRET_TEST_ADMIN: AUTH0_CLIENT_SECRET_TEST_ADMIN
+    AUTH0_CLIENT_ID_TEST_USER: AUTH0_CLIENT_ID_TEST_USER
+    AUTH0_CLIENT_SECRET_TEST_USER: AUTH0_CLIENT_SECRET_TEST_USER
     AUTH0_DOMAIN: AUTH0_DOMAIN
     ALGORITHMS: ALGORITHMS
     API_AUDIENCE: API_AUDIENCE
