@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 AUTH0_CLIENT_ID_TEST_USER = os.environ.get("AUTH0_CLIENT_ID_TEST_USER", None)
-AUTH0_CLIENT_SECRET_TEST_USER = os.environ.get("AUTH0_CLIENT_SECRET_TEST_USER", None)
+AUTH0_CLIENT_SECRET_TEST_USER = os.environ.get(
+    "AUTH0_CLIENT_SECRET_TEST_USER", None)
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", None)
 API_AUDIENCE = os.environ.get("API_AUDIENCE", None)
 
@@ -126,7 +127,9 @@ class AppTestCase(unittest.TestCase):
         message = self.message_403
 
         # When
-        res = self.client().delete(f"/exercises/{exercise_id}", headers=headers)
+        res = self.client().delete(
+            f"/exercises/{exercise_id}",
+            headers=headers)
         data = json.loads(res.data)
 
         # Then
